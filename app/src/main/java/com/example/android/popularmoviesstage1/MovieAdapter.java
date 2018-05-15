@@ -22,12 +22,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
     private int mNumberItems;
     private String[] mData = new String[0];
     private ItemClickListener mClickListener;
+    private Context mContext;
 
 
     //create a constructor that accepts int as a parameter for number of items and store in the variable
-    public MovieAdapter(int numberOfItems, String[] data){
+    public MovieAdapter(int numberOfItems, String[] data, Context context){
         mNumberItems = numberOfItems;
         this.mData = data;
+        this.mContext = context;
     }
 
     @Override
@@ -46,13 +48,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
 
     @Override
     public void onBindViewHolder(NumberViewHolder holder, int position) {
-          /*Picasso.with(this)
-                .load(url)
+
+          String url = mData[position];
+          System.out.println(url);
+          //holder.listItemMovieView.setText(animal);
+          Context context = holder.listItemMovieView.getContext();
+          Picasso.with(context)
+                  .load(url)
                 .placeholder(R.drawable.user_placeholder)
                 .error(R.drawable.user_placeholder_error)
-                .into(listItemMovieView);*/
-          String animal = mData[position];
-          holder.listItemMovieView.setText(animal);
+                .into(holder.listItemMovieView);
     }
 
     @Override
@@ -61,14 +66,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
     }
 
     public class NumberViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        //ImageView listItemMovieView;
-        TextView listItemMovieView;
+        ImageView listItemMovieView;
+        //TextView listItemMovieView;
 
         public NumberViewHolder(View itemView) {
             super(itemView);
 
-            //listItemMovieView = (ImageView) itemView.findViewById(R.id.moviesImage);
-            listItemMovieView = (TextView) itemView.findViewById(R.id.moviesImage);
+            listItemMovieView = (ImageView) itemView.findViewById(R.id.moviesImage);
+            //listItemMovieView = (TextView) itemView.findViewById(R.id.moviesImage);
             itemView.setOnClickListener(this);
         }
 

@@ -25,7 +25,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         //https://stackoverflow.com/questions/40587168/simple-android-grid-example-using-recyclerview-with-gridlayoutmanager-like-the is used to
         //to build recyclerview with grid.
 
-        String[] data = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48"};
+        String[] data = {"https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Grilled_ham_and_cheese_014.JPG/800px-Grilled_ham_and_cheese_014.JPG"
+                , "https://upload.wikimedia.org/wikipedia/commons/c/ca/Bosna_mit_2_Bratw%C3%BCrsten.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/4/48/Chivito1.jpg",
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Club_sandwich.png/800px-Club_sandwich.png"};
 
         mMoviesList = (RecyclerView) findViewById(R.id.movieGrid);
 
@@ -34,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
         mMoviesList.setHasFixedSize(true);
 
-        mAdapter = new MovieAdapter(NUM_LIST_ITEMS, data);
+        mAdapter = new MovieAdapter(NUM_LIST_ITEMS, data, getApplicationContext());
 
         mMoviesList.setAdapter(mAdapter);
 
