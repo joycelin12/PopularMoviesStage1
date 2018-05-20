@@ -15,6 +15,8 @@ import org.json.JSONException;
 
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseMovieJson;
 
@@ -35,6 +37,7 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+        ButterKnife.bind(this);
 
         Intent intent = getIntent();
         if (intent == null) {
@@ -92,11 +95,7 @@ public class DetailActivity extends AppCompatActivity {
         //to convert arrayliststring to charseqence https://stackoverflow.com/questions/3032342/arrayliststring-to-charsequence
         //remove the brackets using the url: https://stackoverflow.com/questions/7536154/remove-brackets-from-a-list-set-to-a-textview
         // alsoKnownAsTextView.setText(Arrays.toString(sandwich.getAlsoKnownAs().toArray(new CharSequence[sandwich.getAlsoKnownAs().size()])).replace("[", "").replace("]", ""));
-        Log.i("TAG", "this is movie movie" + movie.getTitle());
-        Log.i("TAG", "this is movie movie 2" + movie.getReleaseDate());
-        Log.i("TAG", "this is movie movie 3" + movie.getRating());
-        Log.i("TAG", "this is movie movie 4" + movie.getOverview());
-        if (movie != null) {
+          if (movie != null) {
             titleTextView.setText(movie.getTitle());
             releaseDateTextView.setText(movie.getReleaseDate());
             ratingTextView.setText(movie.getRating());
@@ -107,10 +106,6 @@ public class DetailActivity extends AppCompatActivity {
 
         }
 
-        Log.i("TAG", "how movie movie" + movie.getTitle());
-        Log.i("TAG", "how movie movie 2" + movie.getReleaseDate());
-        Log.i("TAG", "how movie movie 3" + movie.getRating());
-        Log.i("TAG", "how movie movie 4" + movie.getOverview());
 
     }
 

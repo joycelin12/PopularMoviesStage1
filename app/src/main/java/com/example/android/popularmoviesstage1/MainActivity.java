@@ -11,16 +11,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.android.popularmoviesstage1.utilities.MovieJsonUtils;
 import com.example.android.popularmoviesstage1.utilities.NetworkUtils;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
@@ -110,10 +106,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     @Override
     public void onItemClick(View view, int position) throws JSONException {
-        Log.i("TAG", "You clicked number " + mAdapter.getItem(position) + ", which is at cell position " + position);
+       // Log.i("TAG", "You clicked number " + mAdapter.getItem(position) + ", which is at cell position " + position);
 
         String details = MovieJsonUtils.parseSingleMovieJson(JSONString, position);
-        Log.i("TAG", "this is JSONString 2 " + details);
+        //Log.i("TAG", "this is JSONString 2 " + details);
 
         launchDetailActivity(details, position);
     }
@@ -156,13 +152,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         @Override
         protected void onPostExecute(String[] movieData) {
 
+            /*
             if (movieData != null && movieData.length > 0) {
                 for (String movieString : movieData) {
-                    Log.i("TAG", "this is " + movieString);
+                   Log.i("TAG", "this is " + movieString);
                 }
-            }
+            } */
 
-            Log.i("TAG", "this is JSONString " + JSONString);
+            //Log.i("TAG", "this is JSONString " + JSONString);
 
             mAdapter = new MovieAdapter(NUM_LIST_ITEMS, movieData, getApplicationContext());
             mAdapter.setClickListener(MainActivity.this);
