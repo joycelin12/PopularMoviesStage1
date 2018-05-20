@@ -3,6 +3,8 @@ package com.example.android.popularmoviesstage1.utilities;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.android.popularmoviesstage1.Model.Movie;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,21 +17,26 @@ import java.net.HttpURLConnection;
 
 public final class MovieJsonUtils {
 
-    /**This method parses JSON from a web response and returns an array of Strings
+    //movie information.
+    private static final String M_RESULTS = "results";
+    private static final String OWM_MESSAGE_CODE = "cod";
+    private static String M_BASEURL = "http://image.tmdb.org/t/p/w185";
+    private static final String JSON_TITLE_KEY = "title";
+    private static final String JSON_RELEASE_DATE_KEY = "release_date";
+    private static final String JSON_RATING_KEY = "vote_average";
+    private static final String JSON_OVERVIEW_KEY = "overview";
+    private static final String JSON_IMAGE_KEY = "poster_path";
+
+
+    /**This method parses JSON from a web response and returns an array of Strings of movie posters
      * @param MovieJsonStr JSON response from server
      *
      * @return Array of Strings describing weather data
      *
      * @throws JSONException If JSON data cannot be properly parsed
      */
-     public static String[] getSimpleMovieStringsFromJson(Context context, String MovieJsonStr)
+     public static String[] getSimpleMovieFromJson(Context context, String MovieJsonStr)
             throws JSONException {
-
-         //movie information.
-         final String M_RESULTS = "results";
-         final String OWM_MESSAGE_CODE = "cod";
-         final String M_BASEURL = "http://image.tmdb.org/t/p/w185";
-
 
          //string array to hold each movie string
          String[] parsedMovieData = null;
@@ -64,9 +71,7 @@ public final class MovieJsonUtils {
                      movieArray.getJSONObject(i);
 
 
-             String poster_path = movieObject.getString("poster_path");
-
-             String id = movieObject.getString("id");
+             String poster_path = movieObject.getString(JSON_IMAGE_KEY);
 
              parsedMovieData[i] = M_BASEURL + poster_path;
 
@@ -77,5 +82,56 @@ public final class MovieJsonUtils {
 
      }
 
+    public static Movie parseMovieJson(String json) throws JSONException {
+
+        //create a new variable to store movie details
+        Movie details = new Movie();
+        JSONObject jsonObj = new JSONObject(json);
+
+
+
+
+        String poster_path = jsonObj.getString(JSON_IMAGE_KEY);
+        Log.i("TAG", "this is poster path " + poster_path);
+
+
+        String title = jsonObj.optString(JSON_TITLE_KEY);
+        Log.i("TAG", "this is title " + title);
+
+
+        String release_date = jsonObj.optString(JSON_RELEASE_DATE_KEY);
+        Log.i("TAG", "this is release " + release_date);
+
+
+        String rating = jsonObj.optString(JSON_RATING_KEY);
+        Log.i("TAG", "this is rating " + rating);
+
+
+        String overview = jsonObj.optString(JSON_OVERVIEW_KEY);
+        Log.i("TAG", "this is overview " + overview);
+
+
+        String image = M_BASEURL + poster_path;
+        Log.i("TAG", "this is iamge " + image);
+
+
+        details.setTitle(title);
+        details.setRelease_date(release_date);
+        details.setRating(rating);
+        details.setOverview(overview);
+        details.setImage(image);
+
+        return details;
 
     }
+
+    public static String parseSingleMovieJson(String MovieJsonStr, int position) throws JSONException {
+
+        JSONObject movieJson = new JSONObject(MovieJsonStr);
+        JSONArray movieArray = movieJson.getJSONArray(M_RESULTS);
+        JSONObject movieObject = movieArray.getJSONObject(position);
+        return movieObject.toString();
+
+    }
+
+}

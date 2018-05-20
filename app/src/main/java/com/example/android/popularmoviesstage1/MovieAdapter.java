@@ -7,10 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
 
 /**
  * Created by joycelin12 on 5/6/18.
@@ -50,14 +53,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
     public void onBindViewHolder(NumberViewHolder holder, int position) {
 
           String url = mData[position];
-          System.out.println(url);
+          //System.out.println(url);
           //holder.listItemMovieView.setText(animal);
           Context context = holder.listItemMovieView.getContext();
           Picasso.with(context)
                   .load(url)
-                .placeholder(R.drawable.user_placeholder)
-                .error(R.drawable.user_placeholder_error)
-                .into(holder.listItemMovieView);
+                  .placeholder(R.drawable.user_placeholder)
+                  .error(R.drawable.user_placeholder_error)
+                  .into(holder.listItemMovieView);
+
+
     }
 
     @Override
@@ -79,11 +84,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
 
         @Override
         public void onClick(View view) {
-            if (mClickListener != null) {
+            if (mClickListener != null) try {
                 mClickListener.onItemClick(view, getAdapterPosition());
-                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
-
 
     }
 
@@ -99,7 +105,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
 
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
-        void onItemClick(View view, int position);
+        void onItemClick(View view, int position) throws JSONException;
     }
+
 
 }

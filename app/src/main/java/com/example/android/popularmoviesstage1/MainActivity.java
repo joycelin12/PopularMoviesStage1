@@ -1,6 +1,7 @@
 package com.example.android.popularmoviesstage1;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,12 +11,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.android.popularmoviesstage1.utilities.MovieJsonUtils;
 import com.example.android.popularmoviesstage1.utilities.NetworkUtils;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private static final int NUM_COLS = 2;
     private MovieAdapter mAdapter;
     private RecyclerView mMoviesList;
+    private String JSONString;
 
     public MainActivity() {
     }
@@ -42,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 , "https://upload.wikimedia.org/wikipedia/commons/c/ca/Bosna_mit_2_Bratw%C3%BCrsten.jpg",
                 "https://upload.wikimedia.org/wikipedia/commons/4/48/Chivito1.jpg",
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Club_sandwich.png/800px-Club_sandwich.png"};
-        */
+       */
 
         String sort = "popular";
 
@@ -59,14 +65,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
         //mMoviesList.setAdapter(mAdapter);
 
+        //mAdapter = new MovieAdapter(NUM_LIST_ITEMS, data, getApplicationContext());
+        //MovieAdapter.ItemClickListener mClickListener = (MovieAdapter.ItemClickListener) this;
+        //mAdapter.setClickListener(this);
+        //mMoviesList.setAdapter(mAdapter);
+
+
         //allow up navigation
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    @Override
-    public void onItemClick(View view, int position) {
-        Log.i("TAG", "You clicked number " + mAdapter.getItem(position) + ", which is at cell position " + position);
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -82,14 +91,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             String message = "Popular clicked";
             Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             String sort = "popular";
-            //loadMovieData(sort);
+            loadMovieData(sort);
         }
         if (menuItemThatWasSelected == R.id.action_toprated) {
             Context context = MainActivity.this;
             String message = "Ratings clicked";
             Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             String sort = "top_rated";
-            //loadMovieData(sort);
+            loadMovieData(sort);
         }
 
         return super.onOptionsItemSelected(item);
@@ -97,6 +106,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     private void loadMovieData(String sort) {
         new MovieTask().execute(sort);
+    }
+
+    @Override
+    public void onItemClick(View view, int position) throws JSONException {
+        Log.i("TAG", "You clicked number " + mAdapter.getItem(position) + ", which is at cell position " + position);
+
+        String details = MovieJsonUtils.parseSingleMovieJson(JSONString, position);
+        Log.i("TAG", "this is JSONString 2 " + details);
+
+        launchDetailActivity(details, position);
     }
 
     //Got the code from T02.05 Exercise CreateAsync Task & S02.01 Exercise Networking
@@ -109,16 +128,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 return null;
             }
 
-
             String sort = params[0];
             URL movieUrl = NetworkUtils.buildUrl(sort);
 
             try {
 
-                String jsonMovieResponse = NetworkUtils.getResponseFromHttpUrl(movieUrl);
+                JSONString = NetworkUtils.getResponseFromHttpUrl(movieUrl);
 
                 String[] simpleJsonMovieData = MovieJsonUtils.
-                        getSimpleMovieStringsFromJson(MainActivity.this, jsonMovieResponse);
+                        getSimpleMovieFromJson(MainActivity.this, JSONString);
 
                 return simpleJsonMovieData;
 
@@ -144,11 +162,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 }
             }
 
-            mAdapter = new MovieAdapter(NUM_LIST_ITEMS, movieData, getApplicationContext());
+            Log.i("TAG", "this is JSONString " + JSONString);
 
+            mAdapter = new MovieAdapter(NUM_LIST_ITEMS, movieData, getApplicationContext());
+            mAdapter.setClickListener(MainActivity.this);
             mMoviesList.setAdapter(mAdapter);
+
         }
 
+    }
+
+    private void launchDetailActivity(String JSONString, int position) {
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(DetailActivity.EXTRA_POSITION, position);
+        intent.putExtra(DetailActivity.MOVIE_DETAILS, JSONString);
+        startActivity(intent);
     }
 
 }
