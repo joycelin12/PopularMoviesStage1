@@ -2,6 +2,8 @@ package com.example.android.popularmoviesstage1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +21,8 @@ import com.example.android.popularmoviesstage1.utilities.NetworkUtils;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener {
@@ -40,15 +44,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         //https://stackoverflow.com/questions/40587168/simple-android-grid-example-using-recyclerview-with-gridlayoutmanager-like-the is used to
         //to build recyclerview with grid.
 
-        /*String[] data = {"https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Grilled_ham_and_cheese_014.JPG/800px-Grilled_ham_and_cheese_014.JPG"
-                , "https://upload.wikimedia.org/wikipedia/commons/c/ca/Bosna_mit_2_Bratw%C3%BCrsten.jpg",
-                "https://upload.wikimedia.org/wikipedia/commons/4/48/Chivito1.jpg",
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Club_sandwich.png/800px-Club_sandwich.png"};
-       */
-
         String sort = "popular";
 
-        loadMovieData(sort);
+        if (isOnline()) {
+            loadMovieData(sort);
+        } else  {
+            String message = "There is no internet connection";
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        }
+
 
         mMoviesList = (RecyclerView) findViewById(R.id.movieGrid);
 
@@ -56,16 +60,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         mMoviesList.setLayoutManager(gridLayoutManager);
 
         mMoviesList.setHasFixedSize(true);
-
-        //mAdapter = new MovieAdapter(NUM_LIST_ITEMS, data, getApplicationContext());
-
-        //mMoviesList.setAdapter(mAdapter);
-
-        //mAdapter = new MovieAdapter(NUM_LIST_ITEMS, data, getApplicationContext());
-        //MovieAdapter.ItemClickListener mClickListener = (MovieAdapter.ItemClickListener) this;
-        //mAdapter.setClickListener(this);
-        //mMoviesList.setAdapter(mAdapter);
-
 
         //allow up navigation
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -83,18 +77,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     public boolean onOptionsItemSelected(MenuItem item) {
         int menuItemThatWasSelected = item.getItemId();
         if (menuItemThatWasSelected == R.id.action_popular) {
-            Context context = MainActivity.this;
-            String message = "Popular clicked";
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
             String sort = "popular";
-            loadMovieData(sort);
+            if (isOnline()) {
+                loadMovieData(sort);
+            } else  {
+                String message = "There is no internet connection";
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
         }
         if (menuItemThatWasSelected == R.id.action_toprated) {
-            Context context = MainActivity.this;
-            String message = "Ratings clicked";
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-            String sort = "top_rated";
-            loadMovieData(sort);
+             String sort = "top_rated";
+            if (isOnline()) {
+                loadMovieData(sort);
+            } else  {
+                String message = "There is no internet connection";
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -106,10 +104,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     @Override
     public void onItemClick(View view, int position) throws JSONException {
-       // Log.i("TAG", "You clicked number " + mAdapter.getItem(position) + ", which is at cell position " + position);
 
         String details = MovieJsonUtils.parseSingleMovieJson(JSONString, position);
-        //Log.i("TAG", "this is JSONString 2 " + details);
 
         launchDetailActivity(details, position);
     }
@@ -129,7 +125,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
             try {
 
-                JSONString = NetworkUtils.getResponseFromHttpUrl(movieUrl);
+                //JSONString = NetworkUtils.getResponseFromHttpUrl(movieUrl);
+                NetworkUtils test = new NetworkUtils();
+                JSONString = test.run(movieUrl.toString());
 
                 String[] simpleJsonMovieData = MovieJsonUtils.
                         getSimpleMovieFromJson(MainActivity.this, JSONString);
@@ -152,14 +150,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         @Override
         protected void onPostExecute(String[] movieData) {
 
-            /*
-            if (movieData != null && movieData.length > 0) {
-                for (String movieString : movieData) {
-                   Log.i("TAG", "this is " + movieString);
-                }
-            } */
-
-            //Log.i("TAG", "this is JSONString " + JSONString);
 
             mAdapter = new MovieAdapter(NUM_LIST_ITEMS, movieData, getApplicationContext());
             mAdapter.setClickListener(MainActivity.this);
@@ -175,5 +165,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         intent.putExtra(DetailActivity.MOVIE_DETAILS, JSONString);
         startActivity(intent);
     }
+
+    //referencing from https://stackoverflow.com/questions/1560788/how-to-check-internet-access-on-android-inetaddress-never-times-out/27312494#27312494
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
 
 }

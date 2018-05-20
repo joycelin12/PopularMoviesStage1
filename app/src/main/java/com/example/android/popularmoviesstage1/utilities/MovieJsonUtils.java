@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.android.popularmoviesstage1.Model.Movie;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,37 +91,21 @@ public final class MovieJsonUtils {
         JSONObject jsonObj = new JSONObject(json);
 
 
-
-
         String poster_path = jsonObj.getString(JSON_IMAGE_KEY);
-        Log.i("TAG", "this is poster path " + poster_path);
-
 
         String title = jsonObj.optString(JSON_TITLE_KEY);
-        Log.i("TAG", "this is title " + title);
-
 
         String release_date = jsonObj.optString(JSON_RELEASE_DATE_KEY);
-        Log.i("TAG", "this is release " + release_date);
-
 
         String rating = jsonObj.optString(JSON_RATING_KEY);
-        Log.i("TAG", "this is rating " + rating);
-
 
         String overview = jsonObj.optString(JSON_OVERVIEW_KEY);
-        Log.i("TAG", "this is overview " + overview);
-
-
-        String image = M_BASEURL + poster_path;
-        Log.i("TAG", "this is iamge " + image);
-
 
         details.setTitle(title);
         details.setRelease_date(release_date);
         details.setRating(rating);
         details.setOverview(overview);
-        details.setImage(image);
+        details.setPoster_path(poster_path);
 
         return details;
 
@@ -133,5 +119,13 @@ public final class MovieJsonUtils {
         return movieObject.toString();
 
     }
+
+    public static Movie parseJSON(String response) {
+        Gson gson = new GsonBuilder().create();
+        Movie movie = gson.fromJson(response, Movie.class);
+        return movie;
+    }
+
+
 
 }

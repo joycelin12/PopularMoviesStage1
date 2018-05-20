@@ -10,7 +10,9 @@ public class Movie {
     private String release_date;
     private String rating;
     private String overview;
-    private String image;
+    private String poster_path;
+    private static String M_BASEURL = "http://image.tmdb.org/t/p/w185";
+
 
 
     /**
@@ -19,12 +21,12 @@ public class Movie {
     public Movie() {
     }
 
-    public Movie(String title, String release_date, String rating, String overview, String image) {
+    public Movie(String title, String release_date, String rating, String overview, String poster_path) {
         this.title = title;
         this.release_date = release_date;
         this.rating= rating;
         this.overview = overview;
-        this.image = image;
+        this.poster_path = M_BASEURL + poster_path;
 
     }
 
@@ -59,12 +61,12 @@ public class Movie {
         this.overview = overview;
     }
 
-    public String getImage() {
-        return image;
+    public String getPoster_path() {
+        return M_BASEURL + poster_path;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setPoster_path(String poster_path) {
+        this.poster_path = M_BASEURL + poster_path;
     }
 
 

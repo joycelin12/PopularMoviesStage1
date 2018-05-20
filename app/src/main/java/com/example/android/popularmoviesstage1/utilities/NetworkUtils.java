@@ -15,10 +15,13 @@
  */
 package com.example.android.popularmoviesstage1.utilities;
 
+import android.app.DownloadManager;
 import android.net.Uri;
 import android.util.Log;
 
 import com.example.android.popularmoviesstage1.BuildConfig;
+import com.squareup.picasso.Downloader;
+import com.squareup.picasso.Request;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +30,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
-import static android.content.ContentValues.TAG;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
+
 
 /**
  * These utilities will be used to communicate with the network.
@@ -60,15 +65,13 @@ public class NetworkUtils {
                 .appendQueryParameter(PARAM_KEY, API_KEY)
                 .build();
 
-
-
         URL url = null;
         try {
             url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        Log.i("TAG", "Built URI " + url);
+        //Log.i("TAG", "Built URI " + url);
 
         return url;
 
@@ -82,6 +85,7 @@ public class NetworkUtils {
      * @throws IOException Related to network and stream reading
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
+
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
             InputStream in = urlConnection.getInputStream();
@@ -98,5 +102,18 @@ public class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
+
+    }
+
+    //trying out OkHttp https://square.github.io/okhttp/
+    OkHttpClient client = new OkHttpClient();
+
+    public String run(String url) throws IOException {
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(url)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        return response.body().string();
     }
 }

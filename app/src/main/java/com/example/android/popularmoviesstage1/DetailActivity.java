@@ -18,6 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
+import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseJSON;
 import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseMovieJson;
 
 public class DetailActivity extends AppCompatActivity {
@@ -60,11 +61,17 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         Movie movie = null;
+        /*
         try {
+
             movie = parseMovieJson(movieJson);
+
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
+
+        movie = parseJSON(movieJson);
+
         if (movie == null) {
             // movie data unavailable
             closeOnError();
@@ -72,8 +79,9 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         populateUI(movie);
+        //Log.i("TAG", movie.getPoster_path());
         Picasso.with(this)
-                .load(movie.getImage())
+                .load(movie.getPoster_path())
                 .placeholder(R.drawable.user_placeholder)
                 .error(R.drawable.user_placeholder_error)
                 .into(posterPic);
@@ -89,13 +97,7 @@ public class DetailActivity extends AppCompatActivity {
 
     private void populateUI(Movie movie) {
 
-        //TextView alsoKnownAsTextView = findViewById(R.id.also_known_tv);
-
-        //set the textview with the text
-        //to convert arrayliststring to charseqence https://stackoverflow.com/questions/3032342/arrayliststring-to-charsequence
-        //remove the brackets using the url: https://stackoverflow.com/questions/7536154/remove-brackets-from-a-list-set-to-a-textview
-        // alsoKnownAsTextView.setText(Arrays.toString(sandwich.getAlsoKnownAs().toArray(new CharSequence[sandwich.getAlsoKnownAs().size()])).replace("[", "").replace("]", ""));
-          if (movie != null) {
+            if (movie != null) {
             titleTextView.setText(movie.getTitle());
             releaseDateTextView.setText(movie.getReleaseDate());
             ratingTextView.setText(movie.getRating());
