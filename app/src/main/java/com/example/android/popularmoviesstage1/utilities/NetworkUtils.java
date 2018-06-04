@@ -114,6 +114,35 @@ public class NetworkUtils {
                 .build();
 
         Response response = client.newCall(request).execute();
+        //Log.i("tag", response.body().string());
+        if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
         return response.body().string();
+    }
+
+    /**
+     * Builds the URL used to display the movies trailer/reviews.
+     * @param_type[0] movie id.
+     * @param_type[1] for determining either trailer or review.
+     * @return The URL to use to query the movie server.
+     */
+    public static URL buildUrl2(String[] type) {
+        // TODO (1) Fill in this method to build the proper movie URL
+        Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
+                .appendPath(type[0])
+                .appendPath(type[1])
+                .appendQueryParameter(PARAM_KEY, API_KEY)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        //Log.i("TAG", "Built URI " + url);
+
+        return url;
+
     }
 }

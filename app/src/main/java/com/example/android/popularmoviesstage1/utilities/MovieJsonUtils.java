@@ -72,7 +72,6 @@ public final class MovieJsonUtils {
              JSONObject movieObject =
                      movieArray.getJSONObject(i);
 
-
              String poster_path = movieObject.getString(JSON_IMAGE_KEY);
 
              parsedMovieData[i] = M_BASEURL + poster_path;

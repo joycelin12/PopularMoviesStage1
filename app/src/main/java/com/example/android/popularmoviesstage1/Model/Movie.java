@@ -1,11 +1,15 @@
 package com.example.android.popularmoviesstage1.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by joycelin12 on 5/19/18.
  */
 
-public class Movie {
+public class Movie implements Parcelable {
 
+    private String id;
     private String title;
     private String release_date;
     private String rating;
@@ -13,21 +17,28 @@ public class Movie {
     private String poster_path;
     private static String M_BASEURL = "http://image.tmdb.org/t/p/w185";
 
-
-
     /**
      * No args constructor for use in serialization
      */
     public Movie() {
     }
 
-    public Movie(String title, String release_date, String rating, String overview, String poster_path) {
+    public Movie(String id, String title, String release_date, String rating, String overview, String poster_path) {
+        this.id = id;
         this.title = title;
         this.release_date = release_date;
         this.rating= rating;
         this.overview = overview;
         this.poster_path = M_BASEURL + poster_path;
 
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -69,5 +80,39 @@ public class Movie {
         this.poster_path = M_BASEURL + poster_path;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeString(this.title);
+        dest.writeString(this.release_date);
+        dest.writeString(this.rating);
+        dest.writeString(this.overview);
+        dest.writeString(this.poster_path);
+    }
+
+    protected Movie(Parcel in) {
+        this.id = in.readString();
+        this.title = in.readString();
+        this.release_date = in.readString();
+        this.rating = in.readString();
+        this.overview = in.readString();
+        this.poster_path = in.readString();
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }
