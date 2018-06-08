@@ -3,13 +3,17 @@ package com.example.android.popularmoviesstage1.utilities;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.android.popularmoviesstage1.Model.Movie;
 import com.example.android.popularmoviesstage1.Model.Trailer;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 
 /**
  * Created by joycelin12 on 6/3/18.
@@ -31,11 +35,11 @@ public class TrailerJsonUtils {
      *
      * @throws JSONException If JSON data cannot be properly parsed
      */
-    public static String[] getTrailersFromJson(Context context, String TrailerJsonStr)
+    public static ArrayList<Trailer> getTrailersFromJson(Context context, String TrailerJsonStr)
             throws JSONException {
 
         //string array to hold each movie string
-        String[] parsedTrailersData = null;
+        //String[] parsedTrailersData = null;
 
         JSONObject trailerJson = new JSONObject(TrailerJsonStr);
 
@@ -57,7 +61,7 @@ public class TrailerJsonUtils {
 
         JSONArray trailerArray = trailerJson.getJSONArray(M_RESULTS);
 
-        parsedTrailersData = new String[trailerArray.length()];
+        ArrayList<Trailer> parsedTrailersData = new ArrayList<>();
 
 
         for (int i = 0; i < trailerArray.length(); i++) {
@@ -66,10 +70,14 @@ public class TrailerJsonUtils {
             JSONObject trailerObject =
                     trailerArray.getJSONObject(i);
 
-            String poster_path = trailerObject.getString(JSON_IMAGE_KEY);
+            //String poster_path = trailerObject.getString(JSON_IMAGE_KEY);
 
-            parsedTrailersData[i] = M_BASEURL + poster_path + M_ENDURL;
+            //parsedTrailersData[i] = M_BASEURL + poster_path + M_ENDURL;
 
+            Gson gson = new GsonBuilder().create();
+            Trailer trailer = gson.fromJson(trailerArray.getJSONObject(i).toString(), Trailer.class);
+            parsedTrailersData.add(new Trailer(trailer.getId(),trailer.getKey(),trailer.getName(),trailer.getSize()));
+            
 
         }
 

@@ -5,12 +5,17 @@ import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
+import com.example.android.popularmoviesstage1.Model.Movie;
+import com.example.android.popularmoviesstage1.Model.Trailer;
 import com.example.android.popularmoviesstage1.utilities.NetworkUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import static com.example.android.popularmoviesstage1.utilities.TrailerJsonUtils.getTrailersFromJson;
 
@@ -19,7 +24,7 @@ import static com.example.android.popularmoviesstage1.utilities.TrailerJsonUtils
  * Created by joycelin12 on 6/3/18.
  */
 
-public class MovieTrailerTask extends AsyncTask<String[], Void, String[]> {
+public class MovieTrailerTask extends AsyncTask< String[], Void, ArrayList<Trailer>> {
 
     public TrailerResponse trailers = null;
     private String TrailerString;
@@ -39,7 +44,7 @@ public class MovieTrailerTask extends AsyncTask<String[], Void, String[]> {
     }
 
     @Override
-    protected String[] doInBackground(String[]... params) {
+    protected ArrayList<Trailer> doInBackground(String[]... params) {
 
         String[] type = params[0];
         URL trailerUrl = NetworkUtils.buildUrl2(type);
@@ -55,7 +60,8 @@ public class MovieTrailerTask extends AsyncTask<String[], Void, String[]> {
             //    String[] simpleJsonMovieData = MovieJsonUtils.
             //            getSimpleMovieFromJson(MainActivity.this, JSONString);
 
-            String[] trailerData  = getTrailersFromJson(this.context, TrailerString);
+            //String[] trailerData  = getTrailersFromJson(this.context, TrailerString);
+            ArrayList<Trailer> trailerData  = getTrailersFromJson(this.context, TrailerString);
 
             //return trailerData;
             return trailerData;
@@ -73,15 +79,15 @@ public class MovieTrailerTask extends AsyncTask<String[], Void, String[]> {
 
     // TODO (3) Override onPostExecute to display the results in the GridView
     @Override
-    protected void onPostExecute(String[] trailerData) {
+    protected void onPostExecute(ArrayList<Trailer> trailerData) {
 
 
         //  mAdapter = new MovieAdapter(NUM_LIST_ITEMS, movieData, MainActivity.this);
         //  mAdapter.setClickListener(MainActivity.this);
-        Log.i("TAG8", trailerData[0].toString());
-        Log.i("TAG9", trailerData[1].toString());
+        //Log.i("TAG8", trailerData[0].toString());
+        //Log.i("TAG9", trailerData[1].toString());
 
-        tAdapter = new TrailerAdapter(trailerData.length, trailerData, this.context);
+        tAdapter = new TrailerAdapter(trailerData.size(), trailerData, this.context);
         tAdapter.setClickListener(this.mClickListener);
         this.mTrailersList.setAdapter(tAdapter);
 

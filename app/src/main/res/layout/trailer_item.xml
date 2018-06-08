@@ -14,14 +14,14 @@
     <ImageView
         android:id="@+id/trailerImage"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         app:layout_constraintLeft_toLeftOf="parent"
         tools:src="@drawable/user_placeholder"/>
 
     <TextView
         android:id="@+id/trailerName"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         app:layout_constraintLeft_toRightOf="@+id/trailerImage"
         />
 

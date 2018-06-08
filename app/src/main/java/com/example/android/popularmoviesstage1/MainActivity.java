@@ -19,8 +19,6 @@ import com.example.android.popularmoviesstage1.utilities.MovieJsonUtils;
 
 import org.json.JSONException;
 
-import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseJSON;
-
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener,
         MovieTask.MovieResponse, MovieTrailerTask.TrailerResponse {
 
@@ -115,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     public void onItemClick(View view, int position) throws JSONException {
 
             String details = MovieJsonUtils.parseSingleMovieJson(JSONString, position);
-
 
             launchDetailActivity(details, position, TrailerString);
 
