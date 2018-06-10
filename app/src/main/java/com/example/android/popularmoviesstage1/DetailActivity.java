@@ -1,9 +1,11 @@
 package com.example.android.popularmoviesstage1;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.popularmoviesstage1.Model.Movie;
+import com.example.android.popularmoviesstage1.Model.Trailer;
 import com.example.android.popularmoviesstage1.utilities.MovieJsonUtils;
 import com.example.android.popularmoviesstage1.utilities.TrailerJsonUtils;
 import com.squareup.picasso.Picasso;
@@ -28,9 +31,11 @@ import butterknife.ButterKnife;
 
 import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseJSON;
 import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseMovieJson;
+import static com.example.android.popularmoviesstage1.utilities.TrailerJsonUtils.parseSingleTrailerJson;
 
-public class DetailActivity extends AppCompatActivity implements  TrailerAdapter.ItemClickListener,
-        MovieTrailerTask.TrailerResponse {
+public class DetailActivity extends AppCompatActivity implements TrailerAdapter.ItemClickListener,
+        MovieTrailerTask.TrailerResponse, ReviewAdapter.ItemClickListener,
+        MovieReviewTask.ReviewResponse  {
 
     public static final String EXTRA_POSITION = "extra_position";
     public static final String MOVIE_DETAILS = "movie_details";
@@ -38,10 +43,9 @@ public class DetailActivity extends AppCompatActivity implements  TrailerAdapter
     private static final int DEFAULT_POSITION = -1;
     private static final int NUM_COLS = 1;
     private RecyclerView mTrailersList;
-    private TrailerAdapter tAdapter;
-    private TrailerAdapter.ItemClickListener mClickListener;
+    private RecyclerView mReviewsList;
     private String TrailerString;
-    public String[] movieTrailerData;
+    private String ReviewString;
 
 
 
@@ -99,6 +103,7 @@ public class DetailActivity extends AppCompatActivity implements  TrailerAdapter
 
         setTitle(movie.getTitle());
 
+        //recyclerview for trailer
         mTrailersList = (RecyclerView) findViewById(R.id.movieTrailersGrid);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, NUM_COLS);
@@ -106,17 +111,33 @@ public class DetailActivity extends AppCompatActivity implements  TrailerAdapter
 
         mTrailersList.setHasFixedSize(true);
 
+
         String[] videos = new String[2];
         videos[0] = movie.getId();
         videos[1] ="videos";
+
+        //recyclerview for review
+        mReviewsList = (RecyclerView) findViewById(R.id.movieReviewsGrid);
+
+        GridLayoutManager gridLayoutManager2 = new GridLayoutManager(this, NUM_COLS);
+        mReviewsList.setLayoutManager(gridLayoutManager2);
+
+        mReviewsList.setHasFixedSize(true);
+
+
+        String[] reviews = new String[2];
+        reviews[0] = movie.getId();
+        reviews[1] ="reviews";
+
         if (isOnline()) {
             new MovieTrailerTask(this,  this, mTrailersList, this).execute(videos);
+            new MovieReviewTask(this,  this, mReviewsList, this).execute(reviews);
+
         } else {
             String message = "There is no internet connection";
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
         }
-
 
 
     }
@@ -145,17 +166,24 @@ public class DetailActivity extends AppCompatActivity implements  TrailerAdapter
     @Override
     public void onItemClick2(View view, int position) throws JSONException {
 
-        Log.i("Tag", "tap tap");
+        Trailer trailer = parseSingleTrailerJson(TrailerString, position);
+        //referencing from the website: https://stackoverflow.com/questions/574195/android-youtube-app-play-video-intent
+        Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailer.getKey()));
+        Intent webIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.youtube.com/watch?v=" + trailer.getKey()));
+        try {
+            startActivity(appIntent);
+        } catch (ActivityNotFoundException ex) {
+            startActivity(webIntent);
+        }
 
-        /* String details = MovieJsonUtils.parseSingleMovieJson(JSONString, position);
-        Movie movie = parseJSON(details);
-        String[] videos = new String[2];
-        videos[0] = movie.getId();
-        videos[1] ="videos";
 
-        new MovieTrailerTask(this).execute(videos);*/
+    }
 
-        //launchDetailActivity(details, position, TrailerString);
+    @Override
+    public void onItemClick3(View view, int position) throws JSONException {
+
+       Log.i("TAG","testing");
 
 
     }
@@ -172,6 +200,12 @@ public class DetailActivity extends AppCompatActivity implements  TrailerAdapter
     public void processTrailer(String output) {
         TrailerString = output;
     }
+
+    @Override
+    public void processReview(String output) {
+        ReviewString = output;
+    }
+
 
 
 

@@ -63,7 +63,6 @@ public class TrailerJsonUtils {
 
         ArrayList<Trailer> parsedTrailersData = new ArrayList<>();
 
-
         for (int i = 0; i < trailerArray.length(); i++) {
 
             //Get the JSON object representing results
@@ -75,7 +74,7 @@ public class TrailerJsonUtils {
             //parsedTrailersData[i] = M_BASEURL + poster_path + M_ENDURL;
 
             Gson gson = new GsonBuilder().create();
-            Trailer trailer = gson.fromJson(trailerArray.getJSONObject(i).toString(), Trailer.class);
+            Trailer trailer = gson.fromJson(trailerObject.toString(), Trailer.class);
             parsedTrailersData.add(new Trailer(trailer.getId(),trailer.getKey(),trailer.getName(),trailer.getSize()));
             
 
@@ -83,6 +82,24 @@ public class TrailerJsonUtils {
 
         return parsedTrailersData;
 
+    }
+
+    public static Trailer parseSingleTrailerJson(String TrailerJsonStr, int position) throws JSONException {
+
+        JSONObject trailerJson = new JSONObject(TrailerJsonStr);
+        JSONArray trailerArray = trailerJson.getJSONArray(M_RESULTS);
+        JSONObject trailerObject = trailerArray.getJSONObject(position);
+        Gson gson = new GsonBuilder().create();
+        Trailer trailer = gson.fromJson(trailerObject.toString(), Trailer.class);
+
+        return trailer;
+
+    }
+
+    public static Trailer parseTrailerJSON(String response) {
+        Gson gson = new GsonBuilder().create();
+        Trailer trailer = gson.fromJson(response, Trailer.class);
+        return trailer;
     }
 
 

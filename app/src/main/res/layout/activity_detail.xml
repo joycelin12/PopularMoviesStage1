@@ -114,7 +114,21 @@
             android:layout_height="wrap_content"
             android:textStyle="italic"
             android:paddingLeft="@dimen/paddingLeft"
+            android:paddingTop="@dimen/paddingTop"
             app:layout_constraintTop_toBottomOf="@+id/overview_text"
+
+
+            />
+
+        <TextView
+            android:id="@+id/trailers_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/paddingLeft"
+            android:text="@string/trailers"
+            android:paddingTop="@dimen/paddingTop"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/overview_detail"
 
 
             />
@@ -128,7 +142,32 @@
             android:paddingBottom="5dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            app:layout_constraintTop_toBottomOf="@+id/overview_detail"
+            app:layout_constraintTop_toBottomOf="@+id/trailers_text"
+            />
+
+        <TextView
+            android:id="@+id/review_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/paddingLeft"
+            android:text="@string/review"
+            android:paddingTop="@dimen/paddingTop"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/movieTrailersGrid"
+
+
+            />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/movieReviewsGrid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            app:layout_constraintTop_toBottomOf="@+id/review_text"
             />
 
 

@@ -15,5 +15,8 @@
     <string name="detail_error_message">Movie data not available</string>
 
     <string name="movie_picture">Movie picture</string>
+    <string name="trailers">Trailers</string>
+    <string name="review">Reviews</string>
+    <string name="reviewed_by">Reviewed By:</string>
 
 </resources>
