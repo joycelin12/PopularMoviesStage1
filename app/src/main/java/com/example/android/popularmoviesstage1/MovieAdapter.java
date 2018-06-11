@@ -1,6 +1,7 @@
 package com.example.android.popularmoviesstage1;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
 import android.util.Log;
@@ -8,12 +9,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
+
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_POSTER_PATH;
 
 /**
  * Created by joycelin12 on 5/6/18.
@@ -26,6 +31,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
     private String[] mData = new String[0];
     private ItemClickListener mClickListener;
     private Context mContext;
+    private Cursor mCursor;
+    private static String M_BASEURL = "http://image.tmdb.org/t/p/w185";
+
 
 
     //create a constructor that accepts int as a parameter for number of items and store in the variable
@@ -33,6 +41,13 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
         mNumberItems = numberOfItems;
         this.mData = data;
         this.mContext = context;
+    }
+
+    //create a constructor that accepts int as a parameter for number of items and store in the variable
+    public MovieAdapter(int numberOfItems, Cursor cursor, Context context){
+        mNumberItems = numberOfItems;
+        this.mContext = context;
+        this.mCursor = cursor;
     }
 
     @Override
@@ -52,15 +67,29 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
     @Override
     public void onBindViewHolder(NumberViewHolder holder, int position) {
 
-          String url = mData[position];
-          //System.out.println(url);
-          //holder.listItemMovieView.setText(animal);
-          Context context = holder.listItemMovieView.getContext();
-          Picasso.with(context)
-                  .load(url)
-                  .placeholder(R.drawable.user_placeholder)
-                  .error(R.drawable.user_placeholder_error)
-                  .into(holder.listItemMovieView);
+          String url = null;
+          if (mCursor == null) {
+              Log.i("TAG","inside mData");
+              url = mData[position];
+              //System.out.println(url);
+              //holder.listItemMovieView.setText(animal);
+
+          } else  {
+
+              if(!mCursor.moveToPosition(position)){
+                  return;
+              }
+              url = mCursor.getString(mCursor.getColumnIndex(COLUMN_POSTER_PATH));
+              Log.i("TAG","not inside mData " + url);
+
+
+          }
+        Context context = holder.listItemMovieView.getContext();
+        Picasso.with(context)
+                .load(url)
+                .placeholder(R.drawable.user_placeholder)
+                .error(R.drawable.user_placeholder_error)
+                .into(holder.listItemMovieView);
 
 
     }
@@ -84,6 +113,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
         public void onClick(View view) {
             if (mClickListener != null) try {
                 mClickListener.onItemClick(view, getAdapterPosition());
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -104,6 +134,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position) throws JSONException;
+    }
+
+    public void swapCursor(Cursor newCursor){
+        if (mCursor != null) mCursor.close();
+
+        mCursor = newCursor;
+
+        if(newCursor != null) this.notifyDataSetChanged();
     }
 
 

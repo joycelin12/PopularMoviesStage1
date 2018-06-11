@@ -2,6 +2,8 @@ package com.example.android.popularmoviesstage1;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,9 @@ import com.example.android.popularmoviesstage1.utilities.MovieJsonUtils;
 
 import org.json.JSONException;
 
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_TIMESTAMP;
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.TABLE_NAME;
+
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener,
         MovieTask.MovieResponse, MovieTrailerTask.TrailerResponse {
 
@@ -26,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private RecyclerView mMoviesList;
     private String JSONString;
     private String TrailerString;
+    private SQLiteDatabase mDb;
+    private MovieAdapter mAdapter;
 
 
     public MainActivity() {
@@ -58,6 +65,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         }
 
+        // Create a DB helper (this will create the DB if run for the first time)
+        FavouritesDbHelper dbHelper = new FavouritesDbHelper(this);
+
+        // Keep a reference to the mDb until paused or killed. Get a writable database
+        // because you will be adding restaurant customers
+        mDb = dbHelper.getWritableDatabase();
+
+
     }
 
 
@@ -87,6 +102,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 String message = "There is no internet connection";
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
+        }
+
+        if (menuItemThatWasSelected == R.id.action_favourites) {
+
+                String message = "This is the list of favourite movies";
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                //Run the getAllMovies
+                Cursor cursor = getAllMovies();
+                mAdapter = new MovieAdapter(cursor.getCount(), cursor, this);
+                mMoviesList.setAdapter(mAdapter);
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -135,6 +161,20 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    private Cursor getAllMovies() {
+
+        return mDb.query(
+                TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                COLUMN_TIMESTAMP
+        );
+
     }
 
 

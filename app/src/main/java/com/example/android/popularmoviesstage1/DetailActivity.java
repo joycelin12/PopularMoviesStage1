@@ -1,8 +1,10 @@
 package com.example.android.popularmoviesstage1;
 
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -12,6 +14,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.TABLE_NAME;
 import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseJSON;
 import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseMovieJson;
 import static com.example.android.popularmoviesstage1.utilities.TrailerJsonUtils.parseSingleTrailerJson;
@@ -46,6 +51,8 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private RecyclerView mReviewsList;
     private String TrailerString;
     private String ReviewString;
+    public static final String VID_URL = "http://www.youtube.com/watch?v=";
+    private SQLiteDatabase mDb;
 
 
 
@@ -82,9 +89,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             return;
         }
 
-        Movie movie = null;
-
-        movie = parseJSON(movieJson);
+        final Movie movie = parseJSON(movieJson);
 
         if (movie == null) {
             // movie data unavailable
@@ -138,6 +143,29 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
 
         }
+        // Create a DB helper (this will create the DB if run for the first time)
+        FavouritesDbHelper dbHelper = new FavouritesDbHelper(this);
+
+        // Keep a reference to the mDb until paused or killed. Get a writable database
+        // because you will be adding restaurant customers
+        mDb = dbHelper.getWritableDatabase();
+
+        //favourite
+        // from the website https://alvinalexander.com/source-code/android/android-checkbox-listener-setoncheckedchangelisteneroncheckedchangelistener-exam
+        CheckBox checkBox = (CheckBox) findViewById(R.id.favbutton);
+
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // update your model (or other business logic) based on isChecked
+                if (isChecked) {
+                    addMovie(movie);
+                    Log.i("Tag", "add to database");
+
+                } else {
+                    Log.i("Tag", "remove from database");
+                }
+            }
+        });
 
 
     }
@@ -170,7 +198,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         //referencing from the website: https://stackoverflow.com/questions/574195/android-youtube-app-play-video-intent
         Intent appIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("vnd.youtube:" + trailer.getKey()));
         Intent webIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("http://www.youtube.com/watch?v=" + trailer.getKey()));
+                Uri.parse(VID_URL + trailer.getKey()));
         try {
             startActivity(appIntent);
         } catch (ActivityNotFoundException ex) {
@@ -206,10 +234,21 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         ReviewString = output;
     }
 
+    private long addMovie(Movie movie) {
+        //create ContentValues to pass values onto insert query
+        ContentValues cv = new ContentValues();
+        //call put to insert name value with the key COLUMN_TITLE
+        cv.put(FavouritesContract.FavouritesEntry.COLUMN_ID, movie.getId());
+        cv.put(FavouritesContract.FavouritesEntry.COLUMN_TITLE, movie.getTitle());
+        cv.put(FavouritesContract.FavouritesEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+        cv.put(FavouritesContract.FavouritesEntry.COLUMN_RATING, movie.getRating());
+        cv.put(FavouritesContract.FavouritesEntry.COLUMN_OVERVIEW, movie.getOverview());
+        cv.put(FavouritesContract.FavouritesEntry.COLUMN_POSTER_PATH, movie.getPoster_path());
+        //call insert to run an insert query on TABLE_NAME with content values
+        return mDb.insert(TABLE_NAME, null, cv);
 
 
-
-
+    }
 
 
 }
