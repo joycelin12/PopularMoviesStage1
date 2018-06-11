@@ -163,6 +163,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
                 } else {
                     Log.i("Tag", "remove from database");
+                    removeMovie(movie.getId());
                 }
             }
         });
@@ -247,6 +248,11 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         //call insert to run an insert query on TABLE_NAME with content values
         return mDb.insert(TABLE_NAME, null, cv);
 
+
+    }
+
+    private boolean removeMovie(String id) {
+        return mDb.delete(TABLE_NAME, FavouritesContract.FavouritesEntry.COLUMN_ID + "=" + id, null) > 0;
 
     }
 
