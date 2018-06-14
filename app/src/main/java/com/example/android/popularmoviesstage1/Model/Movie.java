@@ -9,13 +9,14 @@ import android.os.Parcelable;
 
 public class Movie implements Parcelable {
 
+    //https://guides.codepath.com/android/using-parcelable
     private String id;
     private String title;
     private String release_date;
     private String rating;
     private String overview;
     private String poster_path;
-    private static String M_BASEURL = "http://image.tmdb.org/t/p/w185";
+
 
     /**
      * No args constructor for use in serialization
@@ -29,7 +30,8 @@ public class Movie implements Parcelable {
         this.release_date = release_date;
         this.rating= rating;
         this.overview = overview;
-        this.poster_path = M_BASEURL + poster_path;
+        this.poster_path = poster_path;
+
 
     }
 
@@ -73,12 +75,11 @@ public class Movie implements Parcelable {
     }
 
     public String getPoster_path() {
-        return M_BASEURL + poster_path;
+        return poster_path;
     }
 
-    public void setPoster_path(String poster_path) {
-        this.poster_path = M_BASEURL + poster_path;
-    }
+    public void setPoster_path(String poster_path) {this.poster_path = poster_path;}
+
 
     @Override
     public int describeContents() {
@@ -104,7 +105,7 @@ public class Movie implements Parcelable {
         this.poster_path = in.readString();
     }
 
-    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+    public static final Creator<Movie> CREATOR = new Creator<Movie>() {
         @Override
         public Movie createFromParcel(Parcel source) {
             return new Movie(source);

@@ -2,6 +2,7 @@ package com.example.android.popularmoviesstage1;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.popularmoviesstage1.Model.Trailer;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -60,11 +62,13 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.NumberVi
         //System.out.println(url);
         //holder.listItemMovieView.setText(animal);
         String url = M_BASEURL + trailer.getKey() + M_ENDURL;
+       // Log.i("TAG", "this is trailer" + url);
         Context context = holder.listItemTrailerView.getContext();
         Picasso.with(context)
                 .load(url)
                 .placeholder(R.drawable.user_placeholder)
                 .error(R.drawable.user_placeholder_error)
+               /// .networkPolicy(NetworkPolicy.OFFLINE)
                 .into(holder.listItemTrailerView);
 
         holder.listItemNameView.setText(trailer.getName());

@@ -51,19 +51,13 @@ public class MovieTrailerTask extends AsyncTask< String[], Void, ArrayList<Trail
 
         try {
 
-            //JSONString = NetworkUtils.getResponseFromHttpUrl(movieUrl);
             NetworkUtils trailer = new NetworkUtils();
 
             TrailerString = trailer.run(trailerUrl.toString());
 
             trailers.processTrailer(TrailerString);
-            //    String[] simpleJsonMovieData = MovieJsonUtils.
-            //            getSimpleMovieFromJson(MainActivity.this, JSONString);
-
-            //String[] trailerData  = getTrailersFromJson(this.context, TrailerString);
             ArrayList<Trailer> trailerData  = getTrailersFromJson(this.context, TrailerString);
 
-            //return trailerData;
             return trailerData;
 
         } catch (IOException e) {
@@ -81,11 +75,6 @@ public class MovieTrailerTask extends AsyncTask< String[], Void, ArrayList<Trail
     @Override
     protected void onPostExecute(ArrayList<Trailer> trailerData) {
 
-
-        //  mAdapter = new MovieAdapter(NUM_LIST_ITEMS, movieData, MainActivity.this);
-        //  mAdapter.setClickListener(MainActivity.this);
-        //Log.i("TAG8", trailerData[0].toString());
-        //Log.i("TAG9", trailerData[1].toString());
 
         tAdapter = new TrailerAdapter(trailerData.size(), trailerData, this.context);
         tAdapter.setClickListener(this.mClickListener);

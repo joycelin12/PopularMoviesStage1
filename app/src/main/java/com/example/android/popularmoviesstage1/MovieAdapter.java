@@ -14,9 +14,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.popularmoviesstage1.Model.Movie;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
+
+import java.util.ArrayList;
 
 import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_POSTER_PATH;
 
@@ -28,7 +31,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
 
     //add a variable to display the number of items
     private int mNumberItems;
-    private String[] mData = new String[0];
+    private ArrayList<Movie> mData = new ArrayList<Movie>();
     private ItemClickListener mClickListener;
     private Context mContext;
     private Cursor mCursor;
@@ -37,18 +40,18 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
 
 
     //create a constructor that accepts int as a parameter for number of items and store in the variable
-    public MovieAdapter(int numberOfItems, String[] data, Context context){
+    public MovieAdapter(int numberOfItems, ArrayList<Movie> data, Context context){
         mNumberItems = numberOfItems;
         this.mData = data;
         this.mContext = context;
     }
 
     //create a constructor that accepts int as a parameter for number of items and store in the variable
-    public MovieAdapter(int numberOfItems, Cursor cursor, Context context){
+    /*public MovieAdapter(int numberOfItems, Cursor cursor, Context context){
         mNumberItems = numberOfItems;
         this.mContext = context;
         this.mCursor = cursor;
-    }
+    }*/
 
     @Override
     public NumberViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -67,30 +70,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
     @Override
     public void onBindViewHolder(NumberViewHolder holder, int position) {
 
-          String url = null;
-          if (mCursor == null) {
-              Log.i("TAG","inside mData");
-              url = mData[position];
-              //System.out.println(url);
-              //holder.listItemMovieView.setText(animal);
+        String url = null;
+        url = M_BASEURL + mData.get(position).getPoster_path();
 
-          } else  {
-
-              if(!mCursor.moveToPosition(position)){
-                  return;
-              }
-              url = mCursor.getString(mCursor.getColumnIndex(COLUMN_POSTER_PATH));
-              Log.i("TAG","not inside mData " + url);
-
-
-          }
         Context context = holder.listItemMovieView.getContext();
         Picasso.with(context)
                 .load(url)
                 .placeholder(R.drawable.user_placeholder)
                 .error(R.drawable.user_placeholder_error)
                 .into(holder.listItemMovieView);
-
 
     }
 
@@ -122,8 +110,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
     }
 
     // convenience method for getting data at click position
-    String getItem(int id) {
-        return mData[id];
+    Movie getItem(int id) {
+        return mData.get(id);
     }
 
     // allows clicks events to be caught
@@ -134,14 +122,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.NumberViewHo
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position) throws JSONException;
-    }
-
-    public void swapCursor(Cursor newCursor){
-        if (mCursor != null) mCursor.close();
-
-        mCursor = newCursor;
-
-        if(newCursor != null) this.notifyDataSetChanged();
     }
 
 

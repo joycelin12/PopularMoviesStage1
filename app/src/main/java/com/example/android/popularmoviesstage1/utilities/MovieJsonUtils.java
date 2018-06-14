@@ -6,12 +6,14 @@ import android.util.Log;
 import com.example.android.popularmoviesstage1.Model.Movie;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 
 /**
  * Created by joycelin12 on 5/16/18.
@@ -37,11 +39,8 @@ public final class MovieJsonUtils {
      *
      * @throws JSONException If JSON data cannot be properly parsed
      */
-     public static String[] getSimpleMovieFromJson(Context context, String MovieJsonStr)
+     public static ArrayList<Movie> getSimpleMovieFromJson(Context context, String MovieJsonStr)
             throws JSONException {
-
-         //string array to hold each movie string
-         String[] parsedMovieData = null;
 
          JSONObject movieJson = new JSONObject(MovieJsonStr);
 
@@ -63,9 +62,13 @@ public final class MovieJsonUtils {
 
          JSONArray movieArray = movieJson.getJSONArray(M_RESULTS);
 
-         parsedMovieData = new String[movieArray.length()];
+         //parsedMovieData = new String[movieArray.length()];
 
+         Gson gson = new GsonBuilder().create();
 
+         ArrayList<Movie> parsedMovieData = gson.fromJson(movieArray.toString(), new TypeToken<ArrayList<Movie>>(){}.getType());
+
+         /*
          for (int i = 0; i < movieArray.length(); i++) {
 
              //Get the JSON object representing results
@@ -77,7 +80,7 @@ public final class MovieJsonUtils {
              parsedMovieData[i] = M_BASEURL + poster_path;
 
 
-         }
+         } */
 
          return parsedMovieData;
 

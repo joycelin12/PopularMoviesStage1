@@ -17,23 +17,30 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.android.popularmoviesstage1.Model.Movie;
-import com.example.android.popularmoviesstage1.utilities.MovieJsonUtils;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
+
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_ID;
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_OVERVIEW;
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_POSTER_PATH;
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_RATING;
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_RELEASE_DATE;
 import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_TIMESTAMP;
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_TITLE;
 import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.TABLE_NAME;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener,
-        MovieTask.MovieResponse, MovieTrailerTask.TrailerResponse {
+        MovieTask.MovieResponse {
 
     private static final int NUM_COLS = 2;
     private RecyclerView mMoviesList;
-    private String JSONString;
-    private String TrailerString;
     private SQLiteDatabase mDb;
     private MovieAdapter mAdapter;
-
+    private ArrayList<Movie> movieList;
+    public  MovieTask.MovieResponse movies = null;
+    public Boolean favourite = false;
 
     public MainActivity() {
     }
@@ -73,6 +80,21 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         mDb = dbHelper.getWritableDatabase();
 
 
+        if(savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
+            if (movieList != null) {
+                movieList = new ArrayList<Movie>(movieList);
+            }
+        }
+        else {
+            movieList = savedInstanceState.getParcelableArrayList("movies");
+        }
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList("movies", movieList);
+        super.onSaveInstanceState(outState);
     }
 
 
@@ -84,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         int menuItemThatWasSelected = item.getItemId();
         if (menuItemThatWasSelected == R.id.action_popular) {
             String sort = "popular";
@@ -109,8 +132,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 String message = "This is the list of favourite movies";
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
                 //Run the getAllMovies
-                Cursor cursor = getAllMovies();
-                mAdapter = new MovieAdapter(cursor.getCount(), cursor, this);
+                movieList = getAllMovies();
+
+
+            mAdapter = new MovieAdapter(movieList.size(), movieList, this);
+                mAdapter.setClickListener(this);
                 mMoviesList.setAdapter(mAdapter);
 
         }
@@ -125,32 +151,29 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     }
 
     @Override
-    public void processFinish(String output) {
-        JSONString = output;
+    public void processFinish(ArrayList<Movie> output) {
+        movieList = output;
     }
-
-    @Override
-    public void processTrailer(String output) {
-        TrailerString = output;
-    }
-
 
     @Override
     public void onItemClick(View view, int position) throws JSONException {
 
-            String details = MovieJsonUtils.parseSingleMovieJson(JSONString, position);
+            Movie movie = null;
 
-            launchDetailActivity(details, position, TrailerString);
+            movie = movieList.get(position);
+
+            launchDetailActivity(movie, position, favourite);
+
 
 
     }
 
 
-    private void launchDetailActivity(String JSONString, int position, String TrailerString) {
+    private void launchDetailActivity(Movie movie, int position, boolean favourite) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.EXTRA_POSITION, position);
-        intent.putExtra(DetailActivity.MOVIE_DETAILS, JSONString);
-        intent.putExtra(DetailActivity.MOVIE_TRAILERS, TrailerString);
+        intent.putExtra(DetailActivity.MOVIE_DETAILS, movie);
+        intent.putExtra(DetailActivity.MOVIE_FAV, favourite);
         startActivity(intent);
     }
 
@@ -163,9 +186,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    private Cursor getAllMovies() {
+    private ArrayList<Movie> getAllMovies() {
 
-        return mDb.query(
+        favourite = true;
+
+        ArrayList<Movie> movies = new ArrayList<>();
+
+        Cursor cursor = mDb.query(
                 TABLE_NAME,
                 null,
                 null,
@@ -174,6 +201,28 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 null,
                 COLUMN_TIMESTAMP
         );
+
+        //https://www.androidhive.info/2011/11/android-sqlite-database-tutorial/
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            do {
+                Movie movie = new Movie();
+                movie.setId(cursor.getString(cursor.getColumnIndex(COLUMN_ID)));
+                movie.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_TITLE)));
+                movie.setRating(cursor.getString(cursor.getColumnIndex(COLUMN_RATING)));
+                movie.setOverview(cursor.getString(cursor.getColumnIndex(COLUMN_OVERVIEW)));
+                movie.setRelease_date(cursor.getString(cursor.getColumnIndex(COLUMN_RELEASE_DATE)));
+                movie.setPoster_path(cursor.getString(cursor.getColumnIndex(COLUMN_POSTER_PATH)));
+
+                movies.add(movie);
+            } while (cursor.moveToNext());
+        }
+
+        // close db connection
+        mDb.close();
+
+        // return movies list
+        return movies;
 
     }
 

@@ -32,8 +32,10 @@ public class FavouritesDbHelper extends SQLiteOpenHelper {
                 FavouritesEntry.COLUMN_RATING + " TEXT , "  +
                 FavouritesEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, "  +
                 FavouritesEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, "  +
-                FavouritesEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
-                ");";
+                FavouritesEntry.COLUMN_TIMESTAMP + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
+                //");";
+                //add unique to replace entry with the same column id
+               " UNIQUE ("+ FavouritesEntry.COLUMN_ID + ") ON CONFLICT REPLACE);";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIES_TABLE);
     }

@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -24,6 +25,7 @@ import com.example.android.popularmoviesstage1.Model.Movie;
 import com.example.android.popularmoviesstage1.Model.Trailer;
 import com.example.android.popularmoviesstage1.utilities.MovieJsonUtils;
 import com.example.android.popularmoviesstage1.utilities.TrailerJsonUtils;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -33,6 +35,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_ID;
+import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_TIMESTAMP;
 import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.TABLE_NAME;
 import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseJSON;
 import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseMovieJson;
@@ -44,7 +48,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
     public static final String EXTRA_POSITION = "extra_position";
     public static final String MOVIE_DETAILS = "movie_details";
-    public static final String MOVIE_TRAILERS = "movie_trailers";
+    public static final String MOVIE_FAV = "movie_favourite";
     private static final int DEFAULT_POSITION = -1;
     private static final int NUM_COLS = 1;
     private RecyclerView mTrailersList;
@@ -53,8 +57,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private String ReviewString;
     public static final String VID_URL = "http://www.youtube.com/watch?v=";
     private SQLiteDatabase mDb;
-
-
+    private static String M_BASEURL = "http://image.tmdb.org/t/p/w185";
 
     //get all the textview by their id
     @BindView(R.id.title_detail) TextView titleTextView;
@@ -83,13 +86,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
             return;
         }
 
-        String movieJson = intent.getStringExtra(MOVIE_DETAILS);
-        if(movieJson == null) {
-            closeOnError();
-            return;
-        }
-
-        final Movie movie = parseJSON(movieJson);
+        final Movie movie = (Movie) getIntent().getParcelableExtra(MOVIE_DETAILS);
 
         if (movie == null) {
             // movie data unavailable
@@ -99,10 +96,12 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
         populateUI(movie);
         //Log.i("TAG", movie.getPoster_path());
+        //referencing this for image cache https://stackoverflow.com/questions/23391523/load-images-from-disk-cache-with-picasso-if-offline
         Picasso.with(this)
-                .load(movie.getPoster_path())
+                .load(M_BASEURL + movie.getPoster_path())
                 .placeholder(R.drawable.user_placeholder)
                 .error(R.drawable.user_placeholder_error)
+                .networkPolicy(NetworkPolicy.OFFLINE)
                 .into(posterPic);
 
 
@@ -154,15 +153,21 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         // from the website https://alvinalexander.com/source-code/android/android-checkbox-listener-setoncheckedchangelisteneroncheckedchangelistener-exam
         CheckBox checkBox = (CheckBox) findViewById(R.id.favbutton);
 
+        //query the database to check the checkbox if is favourite
+        if(getFav(movie.getId())) {
+           checkBox.setChecked(true);
+        }
+
+
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // update your model (or other business logic) based on isChecked
                 if (isChecked) {
                     addMovie(movie);
-                    Log.i("Tag", "add to database");
+                    //Log.i("Tag", "add to database");
 
                 } else {
-                    Log.i("Tag", "remove from database");
+                    //Log.i("Tag", "remove from database");
                     removeMovie(movie.getId());
                 }
             }
@@ -239,7 +244,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         //create ContentValues to pass values onto insert query
         ContentValues cv = new ContentValues();
         //call put to insert name value with the key COLUMN_TITLE
-        cv.put(FavouritesContract.FavouritesEntry.COLUMN_ID, movie.getId());
+        cv.put(COLUMN_ID, movie.getId());
         cv.put(FavouritesContract.FavouritesEntry.COLUMN_TITLE, movie.getTitle());
         cv.put(FavouritesContract.FavouritesEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
         cv.put(FavouritesContract.FavouritesEntry.COLUMN_RATING, movie.getRating());
@@ -252,7 +257,25 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     }
 
     private boolean removeMovie(String id) {
-        return mDb.delete(TABLE_NAME, FavouritesContract.FavouritesEntry.COLUMN_ID + "=" + id, null) > 0;
+        return mDb.delete(TABLE_NAME, COLUMN_ID + "=" + id, null) > 0;
+
+    }
+
+    private boolean getFav(String id) {
+
+
+
+            Cursor cursor = mDb.query(TABLE_NAME,
+                    new String[]{COLUMN_ID},
+                    COLUMN_ID + "=?",
+                    new String[]{String.valueOf(id)}, null, null, null, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                return true;
+            } else {
+                return false;
+            }
+
 
     }
 
