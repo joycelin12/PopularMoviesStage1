@@ -263,16 +263,16 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
     private boolean getFav(String id) {
 
-
-
             Cursor cursor = mDb.query(TABLE_NAME,
                     new String[]{COLUMN_ID},
                     COLUMN_ID + "=?",
                     new String[]{String.valueOf(id)}, null, null, null, null);
 
             if (cursor != null && cursor.moveToFirst()) {
+                cursor.close();
                 return true;
             } else {
+                cursor.close();
                 return false;
             }
 

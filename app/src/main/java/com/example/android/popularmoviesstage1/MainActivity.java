@@ -38,9 +38,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private RecyclerView mMoviesList;
     private SQLiteDatabase mDb;
     private MovieAdapter mAdapter;
-    private ArrayList<Movie> movieList;
-    public  MovieTask.MovieResponse movies = null;
+    private ArrayList<Movie> moviesList;
     public Boolean favourite = false;
+    private MovieAdapter.ItemClickListener mClickListener;
+
 
     public MainActivity() {
     }
@@ -63,15 +64,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         //allow up navigation
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        String sort = "popular";
-
-        if (isOnline()) {
-            loadMovieData(sort);
-        } else  {
-            String message = "There is no internet connection";
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        }
-
         // Create a DB helper (this will create the DB if run for the first time)
         FavouritesDbHelper dbHelper = new FavouritesDbHelper(this);
 
@@ -80,21 +72,33 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         mDb = dbHelper.getWritableDatabase();
 
 
-        if(savedInstanceState == null || !savedInstanceState.containsKey("movies")) {
-            if (movieList != null) {
-                movieList = new ArrayList<Movie>(movieList);
+        if(savedInstanceState != null) {
+            this.moviesList = savedInstanceState.getParcelableArrayList("movies");
+            mAdapter = new MovieAdapter(this.moviesList.size(), this.moviesList, this);
+            mAdapter.setClickListener(this.mClickListener);
+            this.mMoviesList.setAdapter(mAdapter);
+        } else {
+            String sort = "popular";
+
+            if (isOnline()) {
+                loadMovieData(sort);
+            } else  {
+                String message = "There is no internet connection";
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
-        else {
-            movieList = savedInstanceState.getParcelableArrayList("movies");
-        }
+
+
+
     }
 
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("movies", movieList);
-        super.onSaveInstanceState(outState);
+            super.onSaveInstanceState(outState);
+            outState.putParcelableArrayList("movies", moviesList);
+
+
     }
 
 
@@ -132,10 +136,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 String message = "This is the list of favourite movies";
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
                 //Run the getAllMovies
-                movieList = getAllMovies();
+                moviesList = getAllMovies();
 
 
-            mAdapter = new MovieAdapter(movieList.size(), movieList, this);
+            mAdapter = new MovieAdapter(moviesList.size(), moviesList, this);
                 mAdapter.setClickListener(this);
                 mMoviesList.setAdapter(mAdapter);
 
@@ -152,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     @Override
     public void processFinish(ArrayList<Movie> output) {
-        movieList = output;
+        moviesList = output;
     }
 
     @Override
@@ -160,10 +164,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
             Movie movie = null;
 
-            movie = movieList.get(position);
+            movie = moviesList.get(position);
 
             launchDetailActivity(movie, position, favourite);
-
 
 
     }
@@ -219,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         }
 
         // close db connection
+        cursor.close();
         mDb.close();
 
         // return movies list
