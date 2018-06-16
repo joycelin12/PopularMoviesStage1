@@ -31,6 +31,8 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -58,6 +60,11 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     public static final String VID_URL = "http://www.youtube.com/watch?v=";
     private SQLiteDatabase mDb;
     private static String M_BASEURL = "http://image.tmdb.org/t/p/w185";
+    private RecyclerView mMoviesList;
+    private MovieAdapter mAdapter;
+    private ArrayList<Movie> moviesList;
+
+
 
     //get all the textview by their id
     @BindView(R.id.title_detail) TextView titleTextView;
@@ -169,6 +176,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 } else {
                     //Log.i("Tag", "remove from database");
                     removeMovie(movie.getId());
+
                 }
             }
         });
@@ -240,7 +248,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         ReviewString = output;
     }
 
-    private long addMovie(Movie movie) {
+    private Uri addMovie(Movie movie) {
         //create ContentValues to pass values onto insert query
         ContentValues cv = new ContentValues();
         //call put to insert name value with the key COLUMN_TITLE
@@ -251,28 +259,39 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         cv.put(FavouritesContract.FavouritesEntry.COLUMN_OVERVIEW, movie.getOverview());
         cv.put(FavouritesContract.FavouritesEntry.COLUMN_POSTER_PATH, movie.getPoster_path());
         //call insert to run an insert query on TABLE_NAME with content values
-        return mDb.insert(TABLE_NAME, null, cv);
+        return getContentResolver().insert(FavouritesContract.FavouritesEntry.CONTENT_URI, cv);
 
 
     }
 
     private boolean removeMovie(String id) {
-        return mDb.delete(TABLE_NAME, COLUMN_ID + "=" + id, null) > 0;
+
+     int rows = getContentResolver()
+                .delete(FavouritesContract.FavouritesEntry.buildMoviesUriWithId(id),COLUMN_ID, new String[]{id});
+
+        if (rows > 0) {
+            return true;
+        } else {
+            return false;
+        }
+
 
     }
 
     private boolean getFav(String id) {
 
-            Cursor cursor = mDb.query(TABLE_NAME,
+        Cursor cursor = getContentResolver()
+                .query(FavouritesContract.FavouritesEntry.buildMoviesUriWithId(id),null,null,null,null);
+
+
+          /*  Cursor cursor = mDb.query(TABLE_NAME,
                     new String[]{COLUMN_ID},
                     COLUMN_ID + "=?",
-                    new String[]{String.valueOf(id)}, null, null, null, null);
+                    new String[]{String.valueOf(id)}, null, null, null, null); */
 
             if (cursor != null && cursor.moveToFirst()) {
-                cursor.close();
                 return true;
             } else {
-                cursor.close();
                 return false;
             }
 

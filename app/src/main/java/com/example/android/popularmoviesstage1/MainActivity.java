@@ -35,11 +35,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
         MovieTask.MovieResponse {
 
     private static final int NUM_COLS = 2;
+    private ArrayList<Movie> moviesList;
     private RecyclerView mMoviesList;
     private SQLiteDatabase mDb;
     private MovieAdapter mAdapter;
-    private ArrayList<Movie> moviesList;
-    public Boolean favourite = false;
+    public  Boolean favourite = false;
     private MovieAdapter.ItemClickListener mClickListener;
 
 
@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
             mAdapter = new MovieAdapter(this.moviesList.size(), this.moviesList, this);
             mAdapter.setClickListener(this.mClickListener);
             this.mMoviesList.setAdapter(mAdapter);
+
         } else {
             String sort = "popular";
 
@@ -138,8 +139,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 //Run the getAllMovies
                 moviesList = getAllMovies();
 
-
-            mAdapter = new MovieAdapter(moviesList.size(), moviesList, this);
+                mAdapter = new MovieAdapter(moviesList.size(), moviesList, this);
                 mAdapter.setClickListener(this);
                 mMoviesList.setAdapter(mAdapter);
 
@@ -166,17 +166,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
             movie = moviesList.get(position);
 
-            launchDetailActivity(movie, position, favourite);
+            launchDetailActivity(movie, position);
 
 
     }
 
-
-    private void launchDetailActivity(Movie movie, int position, boolean favourite) {
+    private void launchDetailActivity(Movie movie, int position) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(DetailActivity.EXTRA_POSITION, position);
         intent.putExtra(DetailActivity.MOVIE_DETAILS, movie);
-        intent.putExtra(DetailActivity.MOVIE_FAV, favourite);
         startActivity(intent);
     }
 
@@ -191,19 +189,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     private ArrayList<Movie> getAllMovies() {
 
-        favourite = true;
+         ArrayList<Movie> movies = new ArrayList<>();
 
-        ArrayList<Movie> movies = new ArrayList<>();
+         Cursor cursor = getContentResolver()
+                .query(FavouritesContract.FavouritesEntry.CONTENT_URI,null,null,null,COLUMN_TIMESTAMP);
 
-        Cursor cursor = mDb.query(
-                TABLE_NAME,
-                null,
-                null,
-                null,
-                null,
-                null,
-                COLUMN_TIMESTAMP
-        );
 
         //https://www.androidhive.info/2011/11/android-sqlite-database-tutorial/
         // looping through all rows and adding to list
@@ -220,10 +210,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
                 movies.add(movie);
             } while (cursor.moveToNext());
         }
-
-        // close db connection
-        cursor.close();
-        mDb.close();
 
         // return movies list
         return movies;
