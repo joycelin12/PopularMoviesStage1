@@ -3,16 +3,10 @@ package com.example.android.popularmoviesstage1;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.popularmoviesstage1.Model.Movie;
 import com.squareup.picasso.Picasso;
@@ -20,8 +14,6 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-
-import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_POSTER_PATH;
 
 /**
  * Created by joycelin12 on 5/6/18.

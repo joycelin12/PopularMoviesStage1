@@ -3,8 +3,6 @@ package com.example.android.popularmoviesstage1;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-
 
 import com.example.android.popularmoviesstage1.Model.Movie;
 import com.example.android.popularmoviesstage1.utilities.NetworkUtils;
@@ -15,7 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.*;
+import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.getSimpleMovieFromJson;
 
 /**
  * Created by joycelin12 on 6/2/18.

@@ -6,8 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -29,7 +29,6 @@ import static com.example.android.popularmoviesstage1.FavouritesContract.Favouri
 import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_RELEASE_DATE;
 import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_TIMESTAMP;
 import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_TITLE;
-import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.TABLE_NAME;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ItemClickListener,
         MovieTask.MovieResponse {
@@ -39,7 +38,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
     private RecyclerView mMoviesList;
     private SQLiteDatabase mDb;
     private MovieAdapter mAdapter;
-    public  Boolean favourite = false;
     private MovieAdapter.ItemClickListener mClickListener;
 
 
@@ -73,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
 
         if(savedInstanceState != null) {
+            Log.i("TAG", String.valueOf(this.moviesList.size()));
             this.moviesList = savedInstanceState.getParcelableArrayList("movies");
             mAdapter = new MovieAdapter(this.moviesList.size(), this.moviesList, this);
             mAdapter.setClickListener(this.mClickListener);
@@ -114,27 +113,27 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
         int menuItemThatWasSelected = item.getItemId();
         if (menuItemThatWasSelected == R.id.action_popular) {
-            String sort = "popular";
+            String sort = getString(R.string.Popular);
             if (isOnline()) {
                 loadMovieData(sort);
             } else  {
-                String message = "There is no internet connection";
+                String message = getString(R.string.noic);
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
         if (menuItemThatWasSelected == R.id.action_toprated) {
-             String sort = "top_rated";
+             String sort = getString(R.string.Top_rated);
             if (isOnline()) {
                 loadMovieData(sort);
             } else  {
-                String message = "There is no internet connection";
+                String message = getString(R.string.noic);
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
 
         if (menuItemThatWasSelected == R.id.action_favourites) {
 
-                String message = "This is the list of favourite movies";
+                String message = getString(R.string.favmovies);
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
                 //Run the getAllMovies
                 moviesList = getAllMovies();
@@ -216,6 +215,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Item
 
     }
 
+    @Override
+    public void onResume()
+    {  // After a pause OR at startup
+        super.onResume();
+        //Refresh your stuff here
+    }
 
 
 

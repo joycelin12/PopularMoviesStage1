@@ -15,13 +15,9 @@
  */
 package com.example.android.popularmoviesstage1.utilities;
 
-import android.app.DownloadManager;
 import android.net.Uri;
-import android.util.Log;
 
 import com.example.android.popularmoviesstage1.BuildConfig;
-import com.squareup.picasso.Downloader;
-import com.squareup.picasso.Request;
 
 import java.io.IOException;
 import java.io.InputStream;

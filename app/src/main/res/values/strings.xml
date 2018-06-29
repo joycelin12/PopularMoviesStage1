@@ -19,5 +19,9 @@
     <string name="review">Reviews</string>
     <string name="reviewed_by">Reviewed By:</string>
     <string name="favourites">Favourites</string>
+    <string name="Popular">popular</string>
+    <string name="noic">There is no internet connection</string>
+    <string name="Top_rated">top_rated</string>
+    <string name="favmovies">This is the list of favourite movies</string>
 
 </resources>

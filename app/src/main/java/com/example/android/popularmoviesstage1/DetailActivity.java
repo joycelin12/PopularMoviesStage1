@@ -9,8 +9,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,25 +23,17 @@ import android.widget.Toast;
 
 import com.example.android.popularmoviesstage1.Model.Movie;
 import com.example.android.popularmoviesstage1.Model.Trailer;
-import com.example.android.popularmoviesstage1.utilities.MovieJsonUtils;
-import com.example.android.popularmoviesstage1.utilities.TrailerJsonUtils;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
-
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-
 import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_ID;
-import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.COLUMN_TIMESTAMP;
-import static com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry.TABLE_NAME;
-import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseJSON;
-import static com.example.android.popularmoviesstage1.utilities.MovieJsonUtils.parseMovieJson;
 import static com.example.android.popularmoviesstage1.utilities.TrailerJsonUtils.parseSingleTrailerJson;
 
 public class DetailActivity extends AppCompatActivity implements TrailerAdapter.ItemClickListener,

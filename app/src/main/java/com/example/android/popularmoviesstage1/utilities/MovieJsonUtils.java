@@ -1,7 +1,6 @@
 package com.example.android.popularmoviesstage1.utilities;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.example.android.popularmoviesstage1.Model.Movie;
 import com.google.gson.Gson;

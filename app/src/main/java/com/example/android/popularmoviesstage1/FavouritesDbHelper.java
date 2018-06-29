@@ -3,7 +3,8 @@ package com.example.android.popularmoviesstage1;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.example.android.popularmoviesstage1.FavouritesContract.*;
+
+import com.example.android.popularmoviesstage1.FavouritesContract.FavouritesEntry;
 
 /**
  * Created by joycelin12 on 6/10/18.

@@ -3,13 +3,9 @@ package com.example.android.popularmoviesstage1;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
-import com.example.android.popularmoviesstage1.Model.Movie;
 import com.example.android.popularmoviesstage1.Model.Trailer;
 import com.example.android.popularmoviesstage1.utilities.NetworkUtils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import org.json.JSONException;
 
